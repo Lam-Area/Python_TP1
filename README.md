@@ -1,9 +1,8 @@
 # Python TP1 — Tk
 
 
-# Modules utilisés
+# Standart utilisés
 
-# Standard Python
 - `tkinter`, `tkinter.ttk`
 - `random`
 - `datetime`

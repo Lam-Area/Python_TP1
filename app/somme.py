@@ -11,13 +11,13 @@ def even_list_upto(n: int) -> list[int]:
 def build(parent: tk.Misc) -> ttk.Frame:
     body = ttk.Frame(parent)
 
-    # centrer la carte
+    # centrer la div
     for c in (0, 2):
         body.grid_columnconfigure(c, weight=1)
     body.grid_rowconfigure(0, weight=1)
     body.grid_rowconfigure(2, weight=1)
 
-    # ---- Carte ----
+    # div
     card = ttk.Frame(body, style="Card.TFrame", padding=26)
     card.grid(row=1, column=1, sticky="n", padx=40, pady=18)
     card.configure(width=720)
@@ -33,13 +33,13 @@ def build(parent: tk.Misc) -> ttk.Frame:
     entry = ttk.Entry(card, textvariable=n_var, width=16, style="Input.TEntry")
     entry.grid(row=2, column=0, sticky="w")
 
-    # Message d'aide/erreur (caché par défaut)
+    # Message erreur
     msg_var = tk.StringVar(value="")
     msg = ttk.Label(card, textvariable=msg_var, style="Muted.TLabel")
     msg.grid(row=2, column=1, sticky="w", padx=12)
     msg.grid_remove()
 
-    # ---- Zone résultats (readonly + fond discret + scrollbar auto) ----
+    # result avec scrollbar
     result_wrap = ttk.Frame(card, style="Result.TFrame")
     result_wrap.grid(row=3, column=0, columnspan=4, sticky="nsew", pady=(14, 0))
     card.grid_rowconfigure(3, weight=1)
@@ -50,7 +50,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
         height=7,
         wrap="word",
         relief="flat",
-        background="#202635",     # très léger contraste
+        background="#202635",
         foreground="#E5E7EB",
         insertbackground="#E5E7EB",
         font=("Consolas", 12),
@@ -58,14 +58,14 @@ def build(parent: tk.Misc) -> ttk.Frame:
         takefocus=0
     )
 
-    # >>> Retrait de width= (non supporté par ttk.Scrollbar)
+    # supp du width de la scrollbar (prob de texture)
     vscroll = ttk.Scrollbar(
         result_wrap,
         orient="vertical",
-        style="Result.Vertical.TScrollbar",   # style défini dans main.py
+        style="Result.Vertical.TScrollbar",
     )
 
-    # n'afficher la barre que si besoin
+    # n'afficher la barre que si trop de lignes dans result
     def _update_scroll_visibility():
         first, last = txt.yview()
         if (last - first) >= 1.0:
@@ -82,7 +82,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
     result_wrap.grid_rowconfigure(0, weight=1)
     result_wrap.grid_columnconfigure(0, weight=1)
 
-    # Empêche toute saisie utilisateur dans la zone
+    # pas de saisi dans result
     txt.bind("<Key>", lambda e: "break")
     txt.bind("<Button-1>", lambda e: "break")
 
@@ -100,7 +100,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
 
     def compute(*_):
         raw = n_var.get().strip()
-        # N doit être un entier positif pair
+        # N = pair sinon pair
         if not raw.isdigit():
             msg_var.set("Veuillez saisir un entier positif (ex. 6).")
             msg.grid()
@@ -153,12 +153,12 @@ def build(parent: tk.Misc) -> ttk.Frame:
     entry.bind("<Return>", compute)
     entry.focus_set()
 
-    # Grille interne
+    # Grille
     for i in range(4):
         card.grid_columnconfigure(i, weight=0)
     card.grid_columnconfigure(1, weight=1)
 
-    # Initial : zone vide -> scrollbar cachée
+    # scrollbar cachée
     write_output([])
 
     return body

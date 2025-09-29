@@ -1,4 +1,3 @@
-# temp.py
 import tkinter as tk
 from tkinter import ttk
 
@@ -13,29 +12,27 @@ def _parse_float(s: str) -> float:
 
 def build(parent: tk.Misc) -> ttk.Frame:
     """
-    Body centré : carte plus grande, textes agrandis.
-    Formules/astuce ancrées en bas à GAUCHE du body (hauteur inchangée).
+    centrage div
     """
     body = ttk.Frame(parent)
 
-    # grille pour centrer la carte et réserver une rangée "footer"
     for c in (0, 2):
         body.grid_columnconfigure(c, weight=1)
-    body.grid_rowconfigure(0, weight=1)   # espace haut
-    body.grid_rowconfigure(1, weight=0)   # carte
-    body.grid_rowconfigure(2, weight=1)   # pousse le footer en bas (hauteur inchangée)
+    body.grid_rowconfigure(0, weight=1)
+    body.grid_rowconfigure(1, weight=0)
+    body.grid_rowconfigure(2, weight=1)
 
-    # ---------- Carte agrandie ----------
+    # div agrandit
     card = ttk.Frame(body, style="Card.TFrame", padding=26)
     card.grid(row=1, column=1, sticky="n", padx=40, pady=18)
-    card.configure(width=720)  # + large
+    card.configure(width=720)
 
-    # Titre plus grand
+    # titre agrandit
     ttk.Label(card, text="Convertir une température",
               style="Heading.TLabel", font=("Segoe UI", 15, "bold"))\
        .grid(row=0, column=0, columnspan=6, sticky="w", pady=(0, 14))
 
-    # Radios (typo + état stable)
+    # boutons radio
     choice = tk.StringVar(value="C2F")
     rb_style = "Radio.TRadiobutton"
     ttk.Radiobutton(card, text="Celsius → Fahrenheit", value="C2F",
@@ -45,15 +42,13 @@ def build(parent: tk.Misc) -> ttk.Frame:
                     variable=choice, style=rb_style, cursor="hand2",
                     ).grid(row=1, column=1, sticky="w", pady=(0, 10))
 
-    # Labels un peu plus grands
+    # labels agrandit
     ttk.Label(card, text="Valeur :", style="Muted.TLabel", font=("Segoe UI", 11))\
        .grid(row=2, column=0, sticky="w", pady=(2, 6))
 
-    # Champ clair (texte noir) + un peu plus large
     entry = ttk.Entry(card, width=24, style="Input.TEntry")
     entry.grid(row=3, column=0, sticky="w")
 
-    # Séparateur visuel + résultat plus grand
     ttk.Label(card, text="→", style="Muted.TLabel", font=("Segoe UI", 12))\
        .grid(row=3, column=1, padx=16)
 
@@ -61,7 +56,6 @@ def build(parent: tk.Misc) -> ttk.Frame:
     ttk.Label(card, textvariable=result, font=("Segoe UI", 13, "bold"))\
        .grid(row=3, column=2, sticky="w")
 
-    # Bouton plus grand
     def convert(*_):
         try:
             v = _parse_float(entry.get())
@@ -77,12 +71,12 @@ def build(parent: tk.Misc) -> ttk.Frame:
     entry.bind("<Return>", convert)
     entry.focus_set()
 
-    # grille interne
+    # infos dans la div
     for i in range(6):
         card.grid_columnconfigure(i, weight=0)
     card.grid_columnconfigure(2, weight=1)  # laisse respirer le résultat
 
-    # ---------- Footer (formules) : collé à GAUCHE du body ----------
+    # footer
     footer = ttk.Frame(body)
     footer.grid(row=2, column=0, columnspan=3, sticky="sw", padx=24, pady=(0, 24))
     ttk.Label(

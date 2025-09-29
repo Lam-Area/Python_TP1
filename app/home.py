@@ -1,12 +1,9 @@
-# home.py
 import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
-import sys
 
 
-
-# --- Rendu PDF -> image ---
+# pdf to img
 try:
     import fitz  # PyMuPDF
     from PIL import Image, ImageTk
@@ -27,13 +24,10 @@ PALETTE = {
 }
 
 
-# ---------- Viewer intégré ----------
+# viewer pdf
 class PdfViewer(ttk.Frame):
     """
-    Affiche un PDF dans un Canvas avec barres de défilement.
-    - Fit immédiat à l'ouverture (pas de flash à 100%).
-    - Recalage automatique au redimensionnement tant que l’utilisateur
-      n’a pas zoomé manuellement (auto_fit=True).
+    Affiche un PDF
     """
     def __init__(self, parent: tk.Misc, pdf_path: Path):
         super().__init__(parent, style="Panel.TFrame")
@@ -49,7 +43,7 @@ class PdfViewer(ttk.Frame):
         self.doc = fitz.open(pdf_path.as_posix())
         self.page_index = 0
 
-        # état de zoom
+        # zoom
         self.zoom = 1.0
         self.auto_fit = True        # ← tant qu'aucun zoom manuel
         self._photo = None
@@ -115,30 +109,29 @@ class PdfViewer(ttk.Frame):
         self.vbar.grid(row=0, column=1, sticky="ns")
         self.hbar.grid(row=1, column=0, sticky="ew")
 
-        # Taille initiale généreuse (évite le timbre-poste)
+        # Taille initiale
         toplevel = self.winfo_toplevel()
         toplevel.update_idletasks()
         w = max(720, int(toplevel.winfo_width() * 0.72))
         h = max(420, int(toplevel.winfo_height() * 0.56))
         self.canvas.config(width=w, height=h)
 
-        # Fit immédiat après stabilisation des tailles
+        # taille auto
         self.after_idle(self._initial_fit_and_render)
 
-        # Re-fit sur redimensionnement (si auto_fit actif)
+        # redim auto
         self.canvas.bind("<Configure>", self._on_canvas_resize)
 
-        # Défilement/zoom à la molette
+        # zoom molette
         self._bind_mousewheel()
 
-    # --------- utils fit/zoom ----------
+    # ajustement et zoom
     def _page_label_text(self) -> str:
         return f"Page {self.page_index + 1} / {len(self.doc)} — {self.pdf_path.name}"
 
     def _compute_fit_zoom(self) -> float:
         page = self.doc.load_page(self.page_index)
         pw, ph = page.rect.width, page.rect.height
-        # tenir dans le canvas (avec une petite marge)
         cw = max(1, self.canvas.winfo_width() - 12)
         ch = max(1, self.canvas.winfo_height() - 12)
         return max(0.2, min(4.0, min(cw / pw, ch / ph)))
@@ -161,7 +154,7 @@ class PdfViewer(ttk.Frame):
                 self.zoom = z
                 self.render_page()
 
-    # --------- rendu ----------
+    # rendu
     def render_page(self):
         page = self.doc.load_page(self.page_index)
         mat = fitz.Matrix(self.zoom, self.zoom)
@@ -177,7 +170,7 @@ class PdfViewer(ttk.Frame):
         self.canvas.configure(scrollregion=(0, 0, self._photo.width(), self._photo.height()))
         self.page_lab.configure(text=self._page_label_text())
 
-    # --------- navigation / zoom ----------
+    # navigation zoom
     def prev_page(self):
         if self.page_index > 0:
             self.page_index -= 1
@@ -240,7 +233,7 @@ class PdfViewer(ttk.Frame):
         return "break"
 
 
-# ---------- Cartes “vitrine” ----------
+# vitrine
 def _make_thumb(pdf: Path, width: int = 260, height: int = 340):
     """Retourne (PhotoImage, size) de la 1ère page. Nécessite PyMuPDF + PIL."""
     doc = fitz.open(pdf.as_posix())
@@ -276,22 +269,22 @@ def build(parent: tk.Misc) -> ttk.Frame:
     pdf_dir = project_root / "pdf"
     pdf_files = sorted(pdf_dir.glob("*.pdf"))
 
-    images_refs = []  # éviter le GC des PhotoImage
+    images_refs = []
 
     def open_viewer(p: Path):
-        # remplace la galerie par le viewer
+        # remplace galerie par viewer
         for w in container.grid_slaves(row=1, column=0):
             w.destroy()
 
         viewer = PdfViewer(container, p)
         viewer.grid(row=1, column=0, sticky="nsew")
 
-        # Assure que le viewer prend bien la place (pas de minsize sur un Frame)
+        # assure bonne calibration pour viewer
         container.update_idletasks()
         container.grid_rowconfigure(1, weight=1)  # la ligne du viewer s’étire
         container.grid_columnconfigure(0, weight=1)
 
-        # maintenant que rien n’a crash, on peut binder le Close
+        # option pour close
         viewer.bind("<<PdfViewerClosed>>", lambda _:
         _back_to_gallery())
 

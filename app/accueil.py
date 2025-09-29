@@ -1,4 +1,3 @@
-# accueil.py
 import tkinter as tk
 from tkinter import ttk
 import random
@@ -10,8 +9,7 @@ GREETINGS = [
 
 def _split_names(raw: str) -> list[str]:
     """
-    Coupe sur virgules et retours ligne, nettoie les espaces.
-    Supprime les doublons vides.
+    wipe
     """
     parts = []
     for chunk in raw.replace(";", ",").split(","):
@@ -24,13 +22,13 @@ def _split_names(raw: str) -> list[str]:
 def build(parent: tk.Misc) -> ttk.Frame:
     body = ttk.Frame(parent)
 
-    # centrer la carte
+    # centrage div
     for c in (0, 2):
         body.grid_columnconfigure(c, weight=1)
     body.grid_rowconfigure(0, weight=1)
     body.grid_rowconfigure(2, weight=1)   # rangée du footer (astuce)
 
-    # ---- Carte ----
+    # div
     card = ttk.Frame(body, style="Card.TFrame", padding=26)
     card.grid(row=1, column=1, sticky="n", padx=40, pady=18)
     card.configure(width=720)
@@ -39,7 +37,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
               style="Heading.TLabel", font=("Segoe UI", 15, "bold"))\
         .grid(row=0, column=0, columnspan=4, sticky="w", pady=(0, 14))
 
-    # Champ des noms
+    # input names
     ttk.Label(card, text="Entrez une liste de prénoms (séparés par virgules ou retours à la ligne) :",
               style="Muted.TLabel", font=("Segoe UI", 11))\
         .grid(row=1, column=0, columnspan=4, sticky="w", pady=(0, 6))
@@ -48,7 +46,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
     names_entry = ttk.Entry(card, textvariable=names_var, style="Input.TEntry", width=48)
     names_entry.grid(row=2, column=0, columnspan=2, sticky="w")
 
-    # ---- Zone résultats (readonly + fond discret + scrollbar auto) ----
+    # zone reslult
     result_wrap = ttk.Frame(card, style="Result.TFrame")
     result_wrap.grid(row=4, column=0, columnspan=4, sticky="nsew", pady=(14, 0))
     card.grid_rowconfigure(4, weight=1)
@@ -71,7 +69,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
     result_wrap.grid_rowconfigure(0, weight=1)
     result_wrap.grid_columnconfigure(0, weight=1)
 
-    # scrollbar seulement si nécessaire
+    # scrollbar si trop de lignes
     def _update_scroll_visibility():
         first, last = txt.yview()
         if (last - first) >= 1.0:
@@ -85,7 +83,6 @@ def build(parent: tk.Misc) -> ttk.Frame:
 
     txt.configure(yscrollcommand=_yscroll, state="disabled")
 
-    # bloquer l’édition par l’utilisateur
     txt.bind("<Key>", lambda e: "break")
     txt.bind("<Button-1>", lambda e: "break")
 
@@ -98,7 +95,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
         txt.update_idletasks()
         _update_scroll_visibility()
 
-    # Génération
+    # génération
     def generer(*_):
         raw = names_var.get()
         names = _split_names(raw)
@@ -107,7 +104,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
             show([])
             return
 
-        tip_var.set("")  # efface l’astuce si OK
+        tip_var.set("")  # efface astuce aprs gen
         lines = []
         for name in names:
             greet = random.choice(GREETINGS)
@@ -125,17 +122,17 @@ def build(parent: tk.Misc) -> ttk.Frame:
     ttk.Button(card, text="Générer", style="Primary.TButton", command=generer)\
         .grid(row=2, column=4, padx=(0, 0), sticky="e")
 
-    # ---- Astuce en bas à gauche du BODY (comme temp) ----
+    # tips bas gauche du body
     tip_var = tk.StringVar(value="Astuce : ex. Alice, Bob, Charlie")
     footer = ttk.Frame(body, style="Panel.TFrame")
     footer.grid(row=2, column=0, columnspan=3, sticky="sw", padx=24, pady=(0, 24))
     ttk.Label(footer, textvariable=tip_var, style="Muted.TLabel").pack(anchor="w")
 
-    # Bind + focus
+    # Bind
     names_entry.bind("<Return>", generer)
     names_entry.focus_set()
 
-    # init affichage (cache la scrollbar au départ)
+    # affichage
     show([])
 
     return body

@@ -1,4 +1,3 @@
-# calcul.py
 import tkinter as tk
 from tkinter import ttk
 import random
@@ -19,6 +18,10 @@ DIFFS = {
 
 def build(parent: tk.Misc) -> ttk.Frame:
     body = ttk.Frame(parent)
+
+
+
+
 
     # Centrage
     for c in (0, 2):
@@ -57,7 +60,7 @@ def build(parent: tk.Misc) -> ttk.Frame:
                         style="Radio.TRadiobutton")\
             .grid(row=1, column=i+1, sticky="w", padx=(8, 12))
 
-    # Choix difficulté (aligné avec "Opération")
+    # Choix diff
     ttk.Label(card, text="Difficulté :", style="Muted.TLabel",
               font=("Segoe UI", 11, "bold"))\
         .grid(row=1, column=5, sticky="w", padx=(24, 6))

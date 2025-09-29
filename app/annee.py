@@ -1,22 +1,20 @@
-# annee.py
 import tkinter as tk
 from tkinter import ttk
 from datetime import date
 
 def _is_leap(year: int) -> bool:
-    # Année bissextile : divisible par 4, sauf séculaires non divisibles par 400.
     return (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
 
 def build(parent: tk.Misc) -> ttk.Frame:
     body = ttk.Frame(parent)
 
-    # Centrer la carte
+    # Centrage div
     for c in (0, 2):
         body.grid_columnconfigure(c, weight=1)
     body.grid_rowconfigure(0, weight=1)
     body.grid_rowconfigure(2, weight=1)
 
-    # ---- Carte ----
+    # div
     card = ttk.Frame(body, style="Card.TFrame", padding=24)
     card.grid(row=1, column=1, sticky="n", padx=40, pady=18)
 
@@ -75,11 +73,11 @@ def build(parent: tk.Misc) -> ttk.Frame:
                command=on_verify)\
         .grid(row=1, column=3, padx=(6, 0), sticky="w")
 
-    # Raccourci Entrée
+    # entrée
     entry.bind("<Return>", on_verify)
     entry.focus_set()
 
-    # Tip en bas à gauche du body (garde/retire selon ton choix)
+    # tips en bas du body
     tip = ttk.Label(
         body,
         text="Règle : divisible par 4, sauf les années séculaires (×100) non divisibles par 400.",
